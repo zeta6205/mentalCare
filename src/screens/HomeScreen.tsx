@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Image,
   Dimensions,
   Alert,
   SafeAreaView,
@@ -18,11 +17,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { motion } from 'framer-motion';
+import { Avatar } from '../components/ui/Avatar';
+import { Card } from '../components/ui/Card';
+import { GlassSurface } from '../components/ui/GlassSurface';
+import { LoadingState } from '../components/ui/LoadingState';
+import { colors, radius, sizes, spacing, typography } from '../theme';
+import { API_BASE_URL } from '../config/api';
 
 const { width } = Dimensions.get('window');
 // Base API URL — updated to the new host
-const API_URL = 'http://192.168.4.109:3000';
-
 interface Comment {
   _id: string;
   userId: string;
@@ -54,7 +57,7 @@ const HomeScreen: React.FC = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/posts`);
+      const res = await fetch(`${API_BASE_URL}/posts`);
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -73,7 +76,7 @@ const HomeScreen: React.FC = () => {
   const handleCreatePost = async () => {
     if (!newPost.trim()) return;
     try {
-      const res = await fetch(`${API_URL}/users/${user?._id}/posts`, {
+      const res = await fetch(`${API_BASE_URL}/users/${user?._id}/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newPost.trim() }),
@@ -96,7 +99,7 @@ const HomeScreen: React.FC = () => {
   // ❤️ Curtir post
   const handleLikePost = async (postId: string) => {
     try {
-      const res = await fetch(`${API_URL}/posts/${postId}/like`, { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/posts/${postId}/like`, { method: 'POST' });
       const updatedPost = await res.json();
       setPosts(prev => prev.map(p => (p._id === updatedPost._id ? updatedPost : p)));
     } catch (err) {
@@ -108,7 +111,7 @@ const HomeScreen: React.FC = () => {
   const handleCommentPost = async (postId: string) => {
     if (!commentText.trim()) return;
     try {
-      const res = await fetch(`${API_URL}/posts/${postId}/comment`, {
+      const res = await fetch(`${API_BASE_URL}/posts/${postId}/comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user?._id, comment: commentText.trim() }),
@@ -125,14 +128,14 @@ const HomeScreen: React.FC = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color="#007B83" />
+        <LoadingState message="Carregando publicações..." />
       </SafeAreaView>
     );
   }
 
   return (
     <LinearGradient colors={['#a8edea', '#fed6e3']} style={styles.safe}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: sizes.bottomTabBarReservedSpace }} showsVerticalScrollIndicator={false}>
         {/* Cabeçalho */}
         <View style={styles.header}>
           <Text style={styles.headerText}>Olá, {user?.name}</Text>
@@ -142,7 +145,7 @@ const HomeScreen: React.FC = () => {
         </View>
 
         {/* Criar Post */}
-        <View style={styles.createPost}>
+        <GlassSurface style={styles.createPost}>
           <TextInput
             style={styles.input}
             placeholder="Compartilhe algo inspirador..."
@@ -153,23 +156,16 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity style={styles.postButton} onPress={handleCreatePost}>
             <Text style={styles.postButtonText}>Publicar</Text>
           </TouchableOpacity>
-        </View>
+        </GlassSurface>
 
         {/* Feed */}
         {posts.length === 0 ? (
           <Text style={styles.noPostsText}>✨ Nenhuma publicação ainda. Seja o primeiro!</Text>
         ) : (
           posts.map(post => (
-            <View key={post._id} style={styles.postCard}>
+            <Card key={post._id} style={styles.postCard}>
               <View style={styles.postHeader}>
-                <Image
-                  source={{
-                    uri:
-                      post.avatar ||
-                      'https://cdn-icons-png.flaticon.com/512/847/847969.png',
-                  }}
-                  style={styles.avatar}
-                />
+                <Avatar uri={post.avatar} name={post.userName} size={48} />
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.userName}>{post.userName}</Text>
                   <Text style={styles.postTime}>
@@ -220,7 +216,7 @@ const HomeScreen: React.FC = () => {
                   </Text>
                 </View>
               ))}
-            </View>
+            </Card>
           ))
         )}
       </ScrollView>
@@ -233,11 +229,12 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 30) : 60,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.md,
   },
   center: {
     flex: 1,
@@ -251,55 +248,42 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#333',
+    ...typography.h1,
+    color: colors.textPrimary,
   },
   logoutBtn: {
-    backgroundColor: '#FF6B6B',
-    padding: 10,
-    borderRadius: 25,
+    backgroundColor: colors.semantic.error.main,
+    padding: spacing.xs,
+    borderRadius: radius.full,
   },
   createPost: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
-    elevation: 3,
-    marginBottom: 20,
+    borderRadius: radius.large,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
   },
   input: {
-    backgroundColor: '#f1f1f1',
-    borderRadius: 12,
-    padding: 10,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radius.input,
+    padding: spacing.sm,
     textAlignVertical: 'top',
     minHeight: 60,
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   postButton: {
     alignSelf: 'flex-end',
-    backgroundColor: '#9CE8EA',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 25,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
   },
   postButtonText: {
     fontWeight: '700',
-    color: '#000',
+    color: colors.textOnPrimary,
   },
   postCard: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
-    elevation: 3,
+    marginBottom: spacing.md,
   },
   postHeader: {
     flexDirection: 'row',

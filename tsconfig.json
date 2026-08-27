@@ -7,7 +7,6 @@
       ]
     },
     "jsx": "react-native",
-    "moduleResolution": "node16",
     "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true

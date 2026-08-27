@@ -18,6 +18,10 @@ import type { RootStackParamList } from '../navigation/types';
 import { getUserConversations, findUserById } from '../db';
 import type { Message, Conversation } from '../db';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { EmptyState } from '../components/ui/EmptyState';
+import { GlassSurface } from '../components/ui/GlassSurface';
+import { LoadingState } from '../components/ui/LoadingState';
+import { colors, radius, sizes, spacing, typography } from '../theme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Messages'>;
 
@@ -100,7 +104,7 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ userId }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.searchContainer}>
+        <GlassSurface style={styles.searchContainer}>
           <MaterialIcons name="search" size={24} color="#666" />
           <TextInput
             style={styles.searchInput}
@@ -109,23 +113,19 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ userId }) => {
             onChangeText={setSearch}
             placeholderTextColor="#888"
           />
-        </View>
+        </GlassSurface>
 
         {loading ? (
-          <View style={styles.centerContainer}>
-            <Text>Carregando conversas...</Text>
-          </View>
+          <LoadingState message="Carregando conversas..." />
         ) : filtered.length === 0 ? (
-          <View style={styles.centerContainer}>
-            <Text>Nenhuma conversa encontrada</Text>
-          </View>
+          <EmptyState title="Nenhuma conversa encontrada" description="Quando houver mensagens, elas aparecerão aqui." />
         ) : (
           <FlatList
             data={filtered}
             keyExtractor={item => item.id}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            contentContainerStyle={{ paddingBottom: sizes.bottomTabBarReservedSpace }}
           />
         )}
       </View>
@@ -138,35 +138,34 @@ export default MessagesScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f0fcfb',
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight! + 20 : 40,
   },
-  container: { flex: 1, paddingHorizontal: 20 },
+  container: { flex: 1, paddingHorizontal: spacing.md },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    marginBottom: 15,
-    elevation: 2,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    marginBottom: spacing.md,
   },
-  searchInput: { flex: 1, marginLeft: 10, fontSize: 16, color: '#333' },
+  searchInput: { flex: 1, marginLeft: spacing.xs, ...typography.body, color: colors.textPrimary },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 12,
-    marginBottom: 12,
-    elevation: 2,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radius.card,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
   avatar: { width: 55, height: 55, borderRadius: 30, marginRight: 12 },
   textContainer: { flex: 1 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
-  name: { fontSize: 16, fontWeight: '600', color: '#333' },
-  time: { fontSize: 12, color: '#aaa' },
-  message: { fontSize: 14, color: '#555' },
+  name: { ...typography.bodySemibold, color: colors.textPrimary },
+  time: { ...typography.caption, color: colors.textSecondary },
+  message: { ...typography.bodySmall, color: colors.textSecondary },
 });

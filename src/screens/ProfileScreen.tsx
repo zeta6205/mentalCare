@@ -18,6 +18,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import { GlassSurface } from '../components/ui/GlassSurface';
+import { colors, radius, sizes, spacing, typography } from '../theme';
 
 const ProfileScreen: React.FC = () => {
   const { logout } = useAuth();
@@ -101,7 +103,7 @@ const ProfileScreen: React.FC = () => {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 50 }}
+      contentContainerStyle={{ paddingBottom: sizes.bottomTabBarReservedSpace }}
       showsVerticalScrollIndicator={false}
     >
       {/* 🌈 Banner */}
@@ -190,7 +192,7 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       {/* ✏️ Formulário */}
-      <View style={styles.form}>
+      <GlassSurface style={styles.form}>
         <Text style={styles.sectionTitle}>Editar Informações</Text>
 
         <TextInput
@@ -239,7 +241,7 @@ const ProfileScreen: React.FC = () => {
         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Text style={styles.logoutText}>Sair da Conta</Text>
         </TouchableOpacity>
-      </View>
+      </GlassSurface>
     </ScrollView>
   );
 };
@@ -249,17 +251,17 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fdfdfd',
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 30) + 10 : 60,
   },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
   bannerContainer: {
     width: '100%',
     height: 200,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    borderBottomLeftRadius: radius.large,
+    borderBottomRightRadius: radius.large,
     // Allow avatar to overflow and sit above the banner
     overflow: 'visible',
     zIndex: 1,
@@ -268,8 +270,8 @@ const styles = StyleSheet.create({
     width: '100%', 
     height: '100%', 
     resizeMode: 'cover', 
-    borderBottomLeftRadius: 25, 
-    borderBottomRightRadius: 25 
+    borderBottomLeftRadius: radius.large,
+    borderBottomRightRadius: radius.large
   },
   bannerTouchable: {
     width: '100%',
@@ -356,39 +358,41 @@ const styles = StyleSheet.create({
     marginTop: 5,
     textAlign: 'center',
   },
-  infoSection: { marginTop: 90, alignItems: 'center', paddingHorizontal: 20 },
-  name: { fontSize: 24, fontWeight: '700', color: '#222' },
-  email: { fontSize: 15, color: '#555', marginTop: 4 },
-  bio: { fontSize: 14, color: '#444', marginTop: 10, textAlign: 'center', lineHeight: 20 },
-  form: { paddingHorizontal: 25, marginTop: 30 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#007B83', marginBottom: 15 },
+  infoSection: { marginTop: 90, alignItems: 'center', paddingHorizontal: spacing.lg },
+  name: { ...typography.h1, color: colors.textPrimary },
+  email: { ...typography.bodySmall, color: colors.textSecondary, marginTop: spacing.xxs },
+  bio: { ...typography.bodySmall, color: colors.textSecondary, marginTop: spacing.sm, textAlign: 'center' },
+  form: { borderRadius: radius.large, padding: spacing.lg, marginHorizontal: spacing.md, marginTop: spacing.lg },
+  sectionTitle: { ...typography.h2, color: colors.textPrimary, marginBottom: spacing.md },
   input: {
-    backgroundColor: '#f3f3f3',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 15,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radius.input,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
   editButton: {
-    backgroundColor: '#a8edea',
-    padding: 14,
-    borderRadius: 30,
+    backgroundColor: colors.brandMint,
+    padding: spacing.sm,
+    borderRadius: radius.full,
     alignItems: 'center',
     marginVertical: 10,
   },
   editButtonText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
   saveButton: {
-    backgroundColor: '#007B83',
-    padding: 14,
-    borderRadius: 30,
+    backgroundColor: colors.primary,
+    padding: spacing.sm,
+    borderRadius: radius.full,
     alignItems: 'center',
     marginVertical: 10,
   },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   logoutButton: {
     marginTop: 20,
-    padding: 14,
-    backgroundColor: '#fed6e3',
-    borderRadius: 30,
+    padding: spacing.sm,
+    backgroundColor: colors.brandPink,
+    borderRadius: radius.full,
     alignItems: 'center',
   },
   logoutText: { color: '#b20000', fontWeight: 'bold', fontSize: 16 },

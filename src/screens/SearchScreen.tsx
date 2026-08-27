@@ -12,6 +12,9 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
+import { EmptyState } from '../components/ui/EmptyState';
+import { GlassSurface } from '../components/ui/GlassSurface';
+import { colors, radius, sizes, spacing, typography } from '../theme';
 
 const { width } = Dimensions.get('window');
 const numColumns = 3;
@@ -33,7 +36,7 @@ const SearchScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* Barra de pesquisa */}
-        <View style={styles.searchBar}>
+        <GlassSurface style={styles.searchBar}>
           <TextInput
             style={styles.input}
             placeholder="Pesquisar"
@@ -41,7 +44,7 @@ const SearchScreen = () => {
             onChangeText={setSearchText}
             placeholderTextColor="#888"
           />
-        </View>
+        </GlassSurface>
 
         {/* Grid de imagens */}
         <FlatList
@@ -53,14 +56,12 @@ const SearchScreen = () => {
               <Image source={{ uri: item.uri }} style={styles.image} />
             </TouchableOpacity>
           )}
-          contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
+          contentContainerStyle={{ paddingBottom: sizes.bottomTabBarReservedSpace, paddingTop: 10 }}
           showsVerticalScrollIndicator={false}
         />
 
         {filteredData.length === 0 && (
-          <View style={styles.noResults}>
-            <Text>Nenhum resultado encontrado</Text>
-          </View>
+          <EmptyState title="Nenhum resultado encontrado" description="Tente outro termo para explorar a comunidade." />
         )}
       </View>
     </SafeAreaView>
@@ -72,34 +73,28 @@ export default SearchScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f0fcfb',
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight! + 20 : 40,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: spacing.sm,
   },
   searchBar: {
-    backgroundColor: '#fff',
-    borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    borderRadius: radius.full,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.md,
   },
   input: {
-    fontSize: 16,
-    color: '#333',
+    ...typography.body,
+    color: colors.textPrimary,
   },
   image: {
     width: imageSize,
     height: imageSize,
-    margin: 1,
-    borderRadius: 10,
+    margin: spacing.xxs / 4,
+    borderRadius: radius.input,
   },
   noResults: {
     flex: 1,

@@ -2,6 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Image, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { MaterialIcons } from '@expo/vector-icons';
+import { IconButton } from '../components/ui/IconButton';
+import { GlassSurface } from '../components/ui/GlassSurface';
+import { LoadingState } from '../components/ui/LoadingState';
+import { colors, radius, spacing, typography } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getUserConversations, findUserById, addMessageToConversation } from '../db';
@@ -39,9 +44,7 @@ const ContactScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (authLoading || isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007B83" />
-      </View>
+      <View style={styles.loadingContainer}><LoadingState message="Carregando conversa..." /></View>
     );
   }
 
@@ -89,10 +92,16 @@ const ContactScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <GlassSurface style={styles.header}>
+        <IconButton
+          icon={<MaterialIcons name="arrow-back" size={24} color={colors.primary} />}
+          accessibilityLabel="Voltar para mensagens"
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        />
         <Image source={{ uri: otherUser.avatar }} style={styles.avatar} />
         <Text style={styles.name}>{otherUser.name}</Text>
-      </View>
+      </GlassSurface>
 
       <FlatList
         style={styles.messages}
@@ -105,7 +114,7 @@ const ContactScreen: React.FC<Props> = ({ route, navigation }) => {
         )}
       />
 
-      <View style={styles.inputContainer}>
+      <GlassSurface style={styles.inputContainer}>
         <TextInput
           style={[styles.input, sendingMessage && styles.inputDisabled]}
           placeholder="Digite sua mensagem..."
@@ -128,7 +137,7 @@ const ContactScreen: React.FC<Props> = ({ route, navigation }) => {
             <Text style={styles.sendButtonText}>Enviar</Text>
           )}
         </TouchableOpacity>
-      </View>
+      </GlassSurface>
     </SafeAreaView>
   );
 };
@@ -138,31 +147,31 @@ export default ContactScreen;
 const styles = StyleSheet.create({
   container: { 
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   errorText: {
-    color: '#ff0000',
+    color: colors.semantic.error.main,
     textAlign: 'center',
     marginBottom: 16,
   },
   retryButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#007B83',
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    borderRadius: radius.input,
   },
   retryButtonText: {
     color: '#fff',
@@ -171,10 +180,11 @@ const styles = StyleSheet.create({
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    padding: 16, 
-    backgroundColor: '#f5f5f5',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    padding: spacing.sm,
+    borderRadius: radius.card,
+  },
+  backButton: {
+    marginRight: spacing.xs,
   },
   avatar: { 
     width: 40, 
@@ -185,38 +195,36 @@ const styles = StyleSheet.create({
   name: { 
     fontSize: 18, 
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.textPrimary,
   },
   messages: { 
     flex: 1, 
-    padding: 16,
-    backgroundColor: '#f9f9f9',
+    padding: spacing.md,
+    backgroundColor: colors.background,
   },
   messageBubble: { 
-    padding: 12,
-    borderRadius: 16,
+    padding: spacing.sm,
+    borderRadius: radius.card,
     marginVertical: 4,
     maxWidth: '80%',
   },
   myMessage: { 
-    backgroundColor: '#007B83',
+    backgroundColor: colors.primary,
     alignSelf: 'flex-end',
     borderBottomRightRadius: 4,
   },
   theirMessage: { 
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.surface,
     alignSelf: 'flex-start',
     borderBottomLeftRadius: 4,
   },
   messageText: { 
-    color: '#333',
+    color: colors.textPrimary,
   },
   inputContainer: { 
     flexDirection: 'row', 
-    padding: 8, 
-    borderTopWidth: 1, 
-    borderColor: '#ddd', 
-    backgroundColor: '#fff',
+    padding: spacing.xs,
+    borderRadius: radius.large,
   },
   input: { 
     flex: 1,
@@ -224,9 +232,9 @@ const styles = StyleSheet.create({
     minHeight: 40,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#f1f1f1',
-    borderRadius: 20,
-    fontSize: 16,
+    backgroundColor: colors.surface,
+    borderRadius: radius.full,
+    ...typography.body,
     marginRight: 8,
   },
   inputDisabled: {
@@ -235,8 +243,8 @@ const styles = StyleSheet.create({
   sendButton: { 
     height: 40,
     paddingHorizontal: 16, 
-    backgroundColor: '#007B83', 
-    borderRadius: 20,
+    backgroundColor: colors.primary,
+    borderRadius: radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },

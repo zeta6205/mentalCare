@@ -1,4 +1,5 @@
 // src/communicationbackend/api.ts
+import { API_BASE_URL } from '../config/api';
 export type Card = {
   id: string;
   text: string;
@@ -15,12 +16,9 @@ export type UserProfile = {
   cards: Card[];
 };
 
-// Base URL do backend (atualizado)
-const BASE_URL = 'http://192.168.4.109:3000'; // novo IP da máquina
-
 export const api = {
   register: async (name: string, email: string, password: string): Promise<UserProfile> => {
-    const res = await fetch(`${BASE_URL}/users/register`, {
+    const res = await fetch(`${API_BASE_URL}/users/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),
@@ -30,7 +28,7 @@ export const api = {
   },
 
   login: async (email: string, password: string): Promise<UserProfile> => {
-    const res = await fetch(`${BASE_URL}/users/login`, {
+    const res = await fetch(`${API_BASE_URL}/users/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -40,13 +38,13 @@ export const api = {
   },
 
   getProfile: async (id: string): Promise<UserProfile> => {
-    const res = await fetch(`${BASE_URL}/users/${id}`);
+    const res = await fetch(`${API_BASE_URL}/users/${id}`);
     if (!res.ok) throw new Error((await res.json()).message || 'Erro ao buscar perfil');
     return res.json();
   },
 
   updateProfile: async (id: string, data: Partial<Omit<UserProfile, 'id' | 'email'>>): Promise<UserProfile> => {
-    const res = await fetch(`${BASE_URL}/users/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/users/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -56,7 +54,7 @@ export const api = {
   },
 
   addCard: async (userId: string, text: string, color: string): Promise<Card> => {
-    const res = await fetch(`${BASE_URL}/users/${userId}/cards`, {
+    const res = await fetch(`${API_BASE_URL}/users/${userId}/cards`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, color }),
@@ -68,7 +66,7 @@ export const api = {
   updateCard: async (userId: string, cardId: string, text: string, color?: string): Promise<Card> => {
     const body: any = { text };
     if (color) body.color = color;
-    const res = await fetch(`${BASE_URL}/users/${userId}/cards/${cardId}`, {
+    const res = await fetch(`${API_BASE_URL}/users/${userId}/cards/${cardId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -78,7 +76,7 @@ export const api = {
   },
 
   deleteCard: async (userId: string, cardId: string): Promise<void> => {
-    const res = await fetch(`${BASE_URL}/users/${userId}/cards/${cardId}`, {
+    const res = await fetch(`${API_BASE_URL}/users/${userId}/cards/${cardId}`, {
       method: 'DELETE',
     });
     if (!res.ok) throw new Error((await res.json()).message || 'Erro ao deletar card');
